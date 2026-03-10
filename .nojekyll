@@ -1,0 +1,6 @@
+# ClinicFlow GitHub Pages Configuration
+# This file tells GitHub Pages not to process with Jekyll
+# Just ensure this file exists in your repository
+
+# Your site is built with Jekyll if this file exists
+# and Jekyll is not excluded in your config file

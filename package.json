@@ -1,0 +1,16 @@
+{
+  "name": "clinicflow",
+  "version": "1.0.0",
+  "description": "Clinic Patient Acquisition Automation System",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["clinic", "patient", "acquisition", "healthcare", "crm"],
+  "author": "ClinicFlow Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClinicFlow - Patient Acquisition System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-heartbeat"></i>
+                <span>ClinicFlow</span>
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-page="dashboard">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-page="leads">
+                    <i class="fas fa-users"></i>
+                    <span>Leads</span>
+                    <span class="badge" id="leads-badge">0</span>
+                </a>
+                <a href="#" class="nav-item" data-page="qualification">
+                    <i class="fas fa-filter"></i>
+                    <span>Qualification</span>
+                </a>
+                <a href="#" class="nav-item" data-page="appointments">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Appointments</span>
+                </a>
+                <a href="#" class="nav-item" data-page="reminders">
+                    <i class="fas fa-bell"></i>
+                    <span>Reminders</span>
+                </a>
+                <a href="#" class="nav-item" data-page="reactivation">
+                    <i class="fas fa-redo"></i>
+                    <span>Reactivation</span>
+                </a>
+                <a href="#" class="nav-item" data-page="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+                <a href="#" class="nav-item" data-page="help">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Help</span>
+                </a>
+            </nav>
+
+            <!-- Logout Button -->
+            <div class="sidebar-logout">
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+            <div class="sidebar-footer">
+                <div class="connection-status">
+                    <span class="status-dot online"></span>
+                    <span>All Systems Operational</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="top-header">
+                <div class="header-left">
+                    <h1 id="page-title">Dashboard</h1>
+                    <p class="subtitle" id="page-subtitle">Real-time overview of your patient acquisition</p>
+                </div>
+                <div class="header-right">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search leads, appointments...">
+                    </div>
+                    <button class="btn btn-primary" id="add-lead-btn">
+                        <i class="fas fa-plus"></i> New Lead
+                    </button>
+                    <div class="notification-bell">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-count">3</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Page -->
+            <div class="page-content active" id="page-dashboard">
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon leads">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Total Leads</h3>
+                            <p class="stat-value" id="total-leads">0</p>
+                            <p class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i> 12% this week
+                            </p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon booked">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Booked Consultations</h3>
+                            <p class="stat-value" id="booked-consultations">0</p>
+                            <p class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i> 8% this week
+                            </p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon noshow">
+                            <i class="fas fa-user-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>No-Show Rate</h3>
+                            <p class="stat-value" id="noshow-rate">0%</p>
+                            <p class="stat-change negative">
+                                <i class="fas fa-arrow-down"></i> 2% this week
+                            </p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon revenue">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Projected Revenue</h3>
+                            <p class="stat-value" id="projected-revenue">$0</p>
+                            <p class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i> 15% this week
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="charts-row">
+                    <div class="chart-card">
+                        <h3>Leads by Source</h3>
+                        <div class="chart-container">
+                            <canvas id="leads-source-chart"></canvas>
+                        </div>
+                        <div class="source-legend" id="source-legend">
+                            <div class="legend-item">
+                                <span class="legend-color" style="background: #4F46E5;"></span>
+                                <span>Website</span>
+                                <span class="legend-value">0%</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background: #10B981;"></span>
+                                <span>WhatsApp</span>
+                                <span class="legend-value">0%</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background: #F59E0B;"></span>
+                                <span>Facebook</span>
+                                <span class="legend-value">0%</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background: #EF4444;"></span>
+                                <span>Phone</span>
+                                <span class="legend-value">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Conversion Funnel</h3>
+                        <div class="funnel-container" id="conversion-funnel">
+                            <div class="funnel-stage">
+                                <div class="funnel-bar" style="--width: 100%;">
+                                    <span class="funnel-label">Leads</span>
+                                    <span class="funnel-value">0</span>
+                                </div>
+                            </div>
+                            <div class="funnel-stage">
+                                <div class="funnel-bar" style="--width: 75%;">
+                                    <span class="funnel-label">Qualified</span>
+                                    <span class="funnel-value">0</span>
+                                </div>
+                            </div>
+                            <div class="funnel-stage">
+                                <div class="funnel-bar" style="--width: 50%;">
+                                    <span class="funnel-label">Booked</span>
+                                    <span class="funnel-value">0</span>
+                                </div>
+                            </div>
+                            <div class="funnel-stage">
+                                <div class="funnel-bar" style="--width: 35%;">
+                                    <span class="funnel-label">Completed</span>
+                                    <span class="funnel-value">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity & Upcoming Appointments -->
+                <div class="activity-row">
+                    <div class="activity-card">
+                        <h3>Recent Lead Activity</h3>
+                        <div class="activity-list" id="recent-activity">
+                            <div class="activity-empty">
+                                <i class="fas fa-inbox"></i>
+                                <p>No recent activity</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="activity-card">
+                        <h3>Today's Appointments</h3>
+                        <div class="appointment-list" id="today-appointments">
+                            <div class="appointment-empty">
+                                <i class="fas fa-calendar-day"></i>
+                                <p>No appointments today</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <h3>Quick Actions</h3>
+                    <div class="actions-grid">
+                        <button class="action-card" id="quick-add-lead">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Add New Lead</span>
+                        </button>
+                        <button class="action-card" id="quick-send-blast">
+                            <i class="fas fa-paper-plane"></i>
+                            <span>Send Broadcast</span>
+                        </button>
+                        <button class="action-card" id="quick-reactivation">
+                            <i class="fas fa-redo"></i>
+                            <span>Run Reactivation</span>
+                        </button>
+                        <button class="action-card" id="quick-export">
+                            <i class="fas fa-download"></i>
+                            <span>Export Report</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Leads Page -->
+            <div class="page-content" id="page-leads">
+                <div class="leads-header">
+                    <div class="leads-filters">
+                        <select class="filter-select" id="source-filter">
+                            <option value="">All Sources</option>
+                            <option value="website">Website</option>
+                            <option value="whatsapp">WhatsApp</option>
+                            <option value="facebook">Facebook</option>
+                            <option value="phone">Phone</option>
+                        </select>
+                        <select class="filter-select" id="status-filter">
+                            <option value="">All Status</option>
+                            <option value="new">New</option>
+                            <option value="contacted">Contacted</option>
+                            <option value="qualified">Qualified</option>
+                            <option value="booked">Booked</option>
+                            <option value="completed">Completed</option>
+                            <option value="lost">Lost</option>
+                        </select>
+                        <input type="text" class="search-input" placeholder="Search by name or email...">
+                    </div>
+                    <div class="leads-actions">
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                    </div>
+                </div>
+                <div class="leads-table-container">
+                    <table class="leads-table">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="select-all"></th>
+                                <th>Name</th>
+                                <th>Contact</th>
+                                <th>Source</th>
+                                <th>Treatment Interest</th>
+                                <th>Status</th>
+                                <th>Value</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leads-table-body">
+                            <tr class="empty-row">
+                                <td colspan="8">
+                                    <div class="empty-state">
+                                        <i class="fas fa-users"></i>
+                                        <p>No leads yet. Add your first lead!</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Qualification Page -->
+            <div class="page-content" id="page-qualification">
+                <div class="qualification-header">
+                    <h2>Smart Qualification Flow</h2>
+                    <p>Configure the questions patients answer before booking</p>
+                </div>
+                <div class="qualification-config">
+                    <div class="config-card">
+                        <div class="config-header">
+                            <h3><i class="fas fa-question-circle"></i> Qualification Questions</h3>
+                            <button class="btn btn-secondary btn-sm" id="add-question-btn">
+                                <i class="fas fa-plus"></i> Add Question
+                            </button>
+                        </div>
+                        <div class="questions-list" id="questions-list">
+                            <div class="question-item" data-id="1">
+                                <div class="question-content">
+                                    <span class="question-number">1</span>
+                                    <div class="question-details">
+                                        <h4>Treatment Interest</h4>
+                                        <p>What treatment are you interested in?</p>
+                                    </div>
+                                    <span class="question-type badge">Required</span>
+                                </div>
+                                <div class="question-actions">
+                                    <button class="icon-btn"><i class="fas fa-edit"></i></button>
+                                    <button class="icon-btn danger"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>
+                            <div class="question-item" data-id="2">
+                                <div class="question-content">
+                                    <span class="question-number">2</span>
+                                    <div class="question-details">
+                                        <h4>Budget Range</h4>
+                                        <p>What is your budget for treatment?</p>
+                                    </div>
+                                    <span class="question-type badge">Required</span>
+                                </div>
+                                <div class="question-actions">
+                                    <button class="icon-btn"><i class="fas fa-edit"></i></button>
+                                    <button class="icon-btn danger"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>
+                            <div class="question-item" data-id="3">
+                                <div class="question-content">
+                                    <span class="question-number">3</span>
+                                    <div class="question-details">
+                                        <h4>Urgency Level</h4>
+                                        <p>How soon do you need treatment?</p>
+                                    </div>
+                                    <span class="question-type badge">Required</span>
+                                </div>
+                                <div class="question-actions">
+                                    <button class="icon-btn"><i class="fas fa-edit"></i></button>
+                                    <button class="icon-btn danger"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>
+                            <div class="question-item" data-id="4">
+                                <div class="question-content">
+                                    <span class="question-number">4</span>
+                                    <div class="question-details">
+                                        <h4>Insurance Status</h4>
+                                        <p>Do you have insurance coverage?</p>
+                                    </div>
+                                    <span class="question-type badge optional">Optional</span>
+                                </div>
+                                <div class="question-actions">
+                                    <button class="icon-btn"><i class="fas fa-edit"></i></button>
+                                    <button class="icon-btn danger"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="config-card">
+                        <div class="config-header">
+                            <h3><i class="fas fa-sliders-h"></i> Auto-Routing Rules</h3>
+                        </div>
+                        <div class="routing-rules">
+                            <div class="rule-item">
+                                <div class="rule-condition">
+                                    <span class="rule-label">Budget ></span>
+                                    <span class="rule-value">$2000</span>
+                                </div>
+                                <i class="fas fa-arrow-right"></i>
+                                <div class="rule-action">
+                                    <span class="badge high-value">High Value</span>
+                                </div>
+                            </div>
+                            <div class="rule-item">
+                                <div class="rule-condition">
+                                    <span class="rule-label">Urgency =</span>
+                                    <span class="rule-value">Immediate</span>
+                                </div>
+                                <i class="fas fa-arrow-right"></i>
+                                <div class="rule-action">
+                                    <span class="badge urgent">Priority Booking</span>
+                                </div>
+                            </div>
+                            <div class="rule-item">
+                                <div class="rule-condition">
+                                    <span class="rule-label">Source =</span>
+                                    <span class="rule-value">Facebook</span>
+                                </div>
+                                <i class="fas fa-arrow-right"></i>
+                                <div class="rule-action">
+                                    <span class="badge facebook">Facebook Flow</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Appointments Page -->
+            <div class="page-content" id="page-appointments">
+                <div class="appointments-header">
+                    <div class="calendar-nav">
+                        <button class="btn btn-icon" id="prev-week"><i class="fas fa-chevron-left"></i></button>
+                        <h2 id="calendar-title">This Week</h2>
+                        <button class="btn btn-icon" id="next-week"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="appointment-stats">
+                        <div class="mini-stat">
+                            <span class="mini-stat-value" id="apt-confirmed">0</span>
+                            <span class="mini-stat-label">Confirmed</span>
+                        </div>
+                        <div class="mini-stat">
+                            <span class="mini-stat-value" id="apt-pending">0</span>
+                            <span class="mini-stat-label">Pending</span>
+                        </div>
+                        <div class="mini-stat">
+                            <span class="mini-stat-value" id="apt-cancelled">0</span>
+                            <span class="mini-stat-label">Cancelled</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="calendar-grid" id="calendar-grid">
+                    <div class="calendar-header-row">
+                        <div class="time-column"></div>
+                        <div class="day-column" data-day="mon">Mon</div>
+                        <div class="day-column" data-day="tue">Tue</div>
+                        <div class="day-column" data-day="wed">Wed</div>
+                        <div class="day-column" data-day="thu">Thu</div>
+                        <div class="day-column" data-day="fri">Fri</div>
+                        <div class="day-column" data-day="sat">Sat</div>
+                    </div>
+                    <div class="calendar-body" id="calendar-body">
+                        <!-- Calendar slots will be generated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reminders Page -->
+            <div class="page-content" id="page-reminders">
+                <div class="reminders-header">
+                    <h2>No-Show Reduction System</h2>
+                    <p>Automated reminder sequence configuration</p>
+                </div>
+                <div class="reminders-config">
+                    <div class="reminder-card">
+                        <div class="reminder-timeline">
+                            <div class="timeline-dot primary"></div>
+                        </div>
+                        <div class="reminder-content">
+                            <div class="reminder-header">
+                                <h3>48-Hour Reminder</h3>
+                                <label class="toggle">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="reminder-details">
+                                <p>Send reminder 48 hours before appointment</p>
+                                <div class="reminder-channels">
+                                    <span class="channel-badge whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</span>
+                                    <span class="channel-badge email"><i class="fas fa-envelope"></i> Email</span>
+                                </div>
+                            </div>
+                            <div class="reminder-template">
+                                <label>Template Message:</label>
+                                <textarea>Hi {patient_name}, this is a reminder about your appointment at {clinic_name} on {date} at {time}. Reply CONFIRM to confirm or RESCHEDULE to reschedule.</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="reminder-card">
+                        <div class="reminder-timeline">
+                            <div class="timeline-dot warning"></div>
+                        </div>
+                        <div class="reminder-content">
+                            <div class="reminder-header">
+                                <h3>24-Hour Reminder</h3>
+                                <label class="toggle">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="reminder-details">
+                                <p>Send reminder 24 hours before appointment</p>
+                                <div class="reminder-channels">
+                                    <span class="channel-badge whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</span>
+                                    <span class="channel-badge sms"><i class="fas fa-sms"></i> SMS</span>
+                                </div>
+                            </div>
+                            <div class="reminder-template">
+                                <label>Template Message:</label>
+                                <textarea>Reminder: Your appointment is tomorrow at {time}. We look forward to seeing you! - {clinic_name}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="reminder-card">
+                        <div class="reminder-timeline">
+                            <div class="timeline-dot danger"></div>
+                        </div>
+                        <div class="reminder-content">
+                            <div class="reminder-header">
+                                <h3>Same-Day Reminder</h3>
+                                <label class="toggle">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="reminder-details">
+                                <p>Send reminder on the day of appointment</p>
+                                <div class="reminder-channels">
+                                    <span class="channel-badge whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</span>
+                                </div>
+                            </div>
+                            <div class="reminder-template">
+                                <label>Template Message:</label>
+                                <textarea>Hi {patient_name}, your appointment is today at {time}. See you soon! Reply CONFIRM.</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="reminder-stats">
+                    <h3>Reminder Performance</h3>
+                    <div class="stats-row">
+                        <div class="stat-box">
+                            <span class="stat-number">92%</span>
+                            <span class="stat-label">Delivery Rate</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-number">78%</span>
+                            <span class="stat-label">Confirmation Rate</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-number">15%</span>
+                            <span class="stat-label">No-Show Reduction</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reactivation Page -->
+            <div class="page-content" id="page-reactivation">
+                <div class="reactivation-header">
+                    <h2>Patient Reactivation Campaign</h2>
+                    <p>Re-engage with past patients and win them back</p>
+                </div>
+                <div class="reactivation-overview">
+                    <div class="overview-card">
+                        <div class="overview-icon">
+                            <i class="fas fa-users-slash"></i>
+                        </div>
+                        <div class="overview-content">
+                            <h3>Inactive Patients</h3>
+                            <p class="overview-value" id="inactive-patients">0</p>
+                            <p>Patients not seen in 90+ days</p>
+                        </div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-icon pending">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="overview-content">
+                            <h3>Pending Reactivation</h3>
+                            <p class="overview-value" id="pending-reactivation">0</p>
+                            <p>Awaiting response</p>
+                        </div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-icon success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="overview-content">
+                            <h3>Reactivated</h3>
+                            <p class="overview-value" id="reactivated-count">0</p>
+                            <p>This month</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="reactivation-campaigns">
+                    <h3>Campaign Templates</h3>
+                    <div class="campaigns-grid">
+                        <div class="campaign-card">
+                            <div class="campaign-header">
+                                <span class="campaign-type">Check-up Reminder</span>
+                                <span class="campaign-status active">Active</span>
+                            </div>
+                            <div class="campaign-body">
+                                <p>It's been a while since your last visit. We recommend a routine check-up.</p>
+                                <div class="campaign-stats">
+                                    <div class="campaign-stat">
+                                        <span>Sent</span>
+                                        <strong>156</strong>
+                                    </div>
+                                    <div class="campaign-stat">
+                                        <span>Opened</span>
+                                        <strong>89</strong>
+                                    </div>
+                                    <div class="campaign-stat">
+                                        <span>Booked</span>
+                                        <strong>23</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="campaign-footer">
+                                <button class="btn btn-sm btn-secondary">Edit</button>
+                                <button class="btn btn-sm btn-primary">Run Now</button>
+                            </div>
+                        </div>
+                        <div class="campaign-card">
+                            <div class="campaign-header">
+                                <span class="campaign-type">Special Offer</span>
+                                <span class="campaign-status active">Active</span>
+                            </div>
+                            <div class="campaign-body">
+                                <p>Special discount on teeth cleaning for returning patients!</p>
+                                <div class="campaign-stats">
+                                    <div class="campaign-stat">
+                                        <span>Sent</span>
+                                        <strong>89</strong>
+                                    </div>
+                                    <div class="campaign-stat">
+                                        <span>Opened</span>
+                                        <strong>56</strong>
+                                    </div>
+                                    <div class="campaign-stat">
+                                        <span>Booked</span>
+                                        <strong>18</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="campaign-footer">
+                                <button class="btn btn-sm btn-secondary">Edit</button>
+                                <button class="btn btn-sm btn-primary">Run Now</button>
+                            </div>
+                        </div>
+                        <div class="campaign-card new">
+                            <div class="campaign-header">
+                                <span class="campaign-type">New Treatment</span>
+                                <span class="campaign-status">Draft</span>
+                            </div>
+                            <div class="campaign-body">
+                                <p>We now offer invisible braces! Ask us about our new treatment options.</p>
+                                <div class="campaign-stats">
+                                    <div class="campaign-stat">
+                                        <span>Sent</span>
+                                        <strong>0</strong>
+                                    </div>
+                                    <div class="campaign-stat">
+                                        <span>Opened</span>
+                                        <strong>0</strong>
+                                    </div>
+                                    <div class="campaign-stat">
+                                        <span>Booked</span>
+                                        <strong>0</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="campaign-footer">
+                                <button class="btn btn-sm btn-secondary">Edit</button>
+                                <button class="btn btn-sm btn-primary">Run Now</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Page -->
+            <div class="page-content" id="page-settings">
+                <div class="settings-container">
+                    <div class="settings-section">
+                        <h2><i class="fas fa-briefcase"></i> Business Information</h2>
+                        <div class="settings-form">
+                            <div class="form-group">
+                                <label>Clinic Name</label>
+                                <input type="text" value="Smile Dental Clinic" id="clinic-name">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Phone Number</label>
+                                    <input type="tel" value="+1 (555) 123-4567">
+                                </div>
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <input type="email" value="contact@smiledental.com">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Address</label>
+                                <input type="text" value="123 Health Street, Medical District">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Services Section -->
+                    <div class="settings-section">
+                        <h2><i class="fas fa-hand-holding-medical"></i> Services</h2>
+                        <p class="settings-description">Add your clinic's services. These will appear in the Treatment Interest dropdown for leads.</p>
+                        <div class="services-manager">
+                            <div class="service-input-group">
+                                <input type="text" id="new-service-input" placeholder="Enter service name...">
+                                <button class="btn btn-primary" id="add-service-btn">
+                                    <i class="fas fa-plus"></i> Add
+                                </button>
+                            </div>
+                            <div class="services-list" id="services-list">
+                                <!-- Services will be populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h2><i class="fas fa-plug"></i> Integration Settings</h2>
+                        <div class="integrations-grid">
+                            <div class="integration-card">
+                                <div class="integration-icon whatsapp">
+                                    <i class="fab fa-whatsapp"></i>
+                                </div>
+                                <div class="integration-info">
+                                    <h4>WhatsApp API</h4>
+                                    <p>Connected</p>
+                                </div>
+                                <span class="integration-status connected">Active</span>
+                            </div>
+                            <div class="integration-card">
+                                <div class="integration-icon google">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <div class="integration-info">
+                                    <h4>Google Calendar</h4>
+                                    <p>Connected</p>
+                                </div>
+                                <span class="integration-status connected">Active</span>
+                            </div>
+                            <div class="integration-card">
+                                <div class="integration-icon email">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div class="integration-info">
+                                    <h4>Email Service</h4>
+                                    <p>Connected</p>
+                                </div>
+                                <span class="integration-status connected">Active</span>
+                            </div>
+                            <div class="integration-card">
+                                <div class="integration-icon twilio">
+                                    <i class="fas fa-sms"></i>
+                                </div>
+                                <div class="integration-info">
+                                    <h4>Twilio SMS</h4>
+                                    <p>Not Connected</p>
+                                </div>
+                                <button class="btn btn-sm btn-secondary">Connect</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="settings-section">
+                        <h2><i class="fas fa-bell"></i> Notification Settings</h2>
+                        <div class="notification-toggles">
+                            <div class="toggle-item">
+                                <div class="toggle-info">
+                                    <h4>New Lead Notification</h4>
+                                    <p>Receive notification when new lead is captured</p>
+                                </div>
+                                <label class="toggle">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="toggle-item">
+                                <div class="toggle-info">
+                                    <h4>Booking Confirmation</h4>
+                                    <p>Notify when appointment is booked</p>
+                                </div>
+                                <label class="toggle">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="toggle-item">
+                                <div class="toggle-info">
+                                    <h4>Cancellation Alert</h4>
+                                    <p>Notify when appointment is cancelled</p>
+                                </div>
+                                <label class="toggle">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="toggle-item">
+                                <div class="toggle-info">
+                                    <h4>Daily Summary</h4>
+                                    <p>Receive daily summary of activities</p>
+                                </div>
+                                <label class="toggle">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="settings-section">
+                        <h2><i class="fas fa-database"></i> Backup Settings</h2>
+                        <div class="settings-form">
+                            <div class="form-group">
+                                <label>Backup Location Path</label>
+                                <input type="text" value="C:/Users/Clinic/Documents/ClinicFlowBackups" id="backup-path">
+                            </div>
+                            <div class="form-group">
+                                <label>Backup Email</label>
+                                <input type="email" value="admin@smiledental.com" id="backup-email">
+                            </div>
+                            <div class="form-group">
+                                <label>Auto-Backup Frequency</label>
+                                <select id="backup-frequency">
+                                    <option value="daily">Daily</option>
+                                    <option value="weekly" selected>Weekly</option>
+                                    <option value="monthly">Monthly</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-secondary" id="backup-now-btn">
+                                <i class="fas fa-save"></i> Backup Now
+                            </button>
+                        </div>
+                    </div>
+                    <div class="settings-actions">
+                        <button class="btn btn-secondary">Cancel</button>
+                        <button class="btn btn-primary" id="save-settings">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Help Page -->
+            <div class="page-content" id="page-help">
+                <div class="help-container">
+                    <div class="help-header">
+                        <h2><i class="fas fa-question-circle"></i> Help Center</h2>
+                        <p>Find answers, troubleshooting guides, and documentation</p>
+                    </div>
+                    
+                    <div class="help-search">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search help articles..." id="help-search-input">
+                    </div>
+                    
+                    <div class="help-categories">
+                        <div class="help-category">
+                            <div class="category-icon">
+                                <i class="fas fa-play-circle"></i>
+                            </div>
+                            <h3>Getting Started</h3>
+                            <ul>
+                                <li><a href="#" onclick="showHelpArticle('intro')">Introduction to ClinicFlow</a></li>
+                                <li><a href="#" onclick="showHelpArticle('setup')">Initial Setup Guide</a></li>
+                                <li><a href="#" onclick="showHelpArticle('dashboard')">Understanding the Dashboard</a></li>
+                            </ul>
+                        </div>
+                        <div class="help-category">
+                            <div class="category-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h3>Lead Management</h3>
+                            <ul>
+                                <li><a href="#" onclick="showHelpArticle('add-lead')">How to Add New Leads</a></li>
+                                <li><a href="#" onclick="showHelpArticle('qualify')">Qualifying Leads</a></li>
+                                <li><a href="#" onclick="showHelpArticle('sources')">Managing Lead Sources</a></li>
+                            </ul>
+                        </div>
+                        <div class="help-category">
+                            <div class="category-icon">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <h3>Appointments</h3>
+                            <ul>
+                                <li><a href="#" onclick="showHelpArticle('book-apt')">Booking Appointments</a></li>
+                                <li><a href="#" onclick="showHelpArticle('calendar')">Using the Calendar</a></li>
+                                <li><a href="#" onclick="showHelpArticle('reminders')">Setting Up Reminders</a></li>
+                            </ul>
+                        </div>
+                        <div class="help-category">
+                            <div class="category-icon">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <h3>Automation</h3>
+                            <ul>
+                                <li><a href="#" onclick="showHelpArticle('auto-msg')">Auto-Response Setup</a></li>
+                                <li><a href="#" onclick="showHelpArticle('reactivation')">Patient Reactivation</a></li>
+                                <li><a href="#" onclick="showHelpArticle('integrations')">Integrations Guide</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="help-faq">
+                        <h3><i class="fas fa-comments"></i> Frequently Asked Questions</h3>
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>How do I connect WhatsApp API?</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>To connect WhatsApp API, go to Settings > Integration Settings and click "Connect" next to WhatsApp API. You'll need to register for a WhatsApp Business API account and obtain your API credentials. Enter the credentials in the popup window and click "Verify" to complete the connection.</p>
+                            </div>
+                        </div>
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>Why aren't my reminders being sent?</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Check the following: 1) Make sure reminders are enabled in Reminders settings. 2) Verify your WhatsApp/Email integrations are connected. 3) Ensure patient phone numbers are correctly formatted with country codes.</p>
+                            </div>
+                        </div>
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>How do I export my data?</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Go to the Leads page and click the "Export" button. You can choose to export all leads or selected leads. The system will generate a CSV file that you can download.</p>
+                            </div>
+                        </div>
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>What do the lead status colors mean?</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p><strong>New (Purple):</strong> Recently added leads. <strong>Contacted (Blue):</strong> Initial contact made. <strong>Qualified (Green):</strong> Confirmed interest. <strong>Booked (Orange):</strong> Appointment scheduled. <strong>Completed (Green):</strong> Treatment done. <strong>Lost (Red):</strong> Did not convert.</p>
+                            </div>
+                        </div>
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>How do I set up auto-routing rules?</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Go to the Qualification page and scroll to "Auto-Routing Rules". Click "Add Rule" and define your conditions (budget, urgency, source) and the corresponding action (High Value tag, Priority Booking, etc.).</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="help-errors">
+                        <h3><i class="fas fa-exclamation-triangle"></i> Common Errors & Solutions</h3>
+                        <div class="error-item">
+                            <div class="error-title">
+                                <i class="fas fa-times-circle"></i>
+                                <span>WhatsApp Message Failed</span>
+                            </div>
+                            <div class="error-solution">
+                                <strong>Solution:</strong> Check if the phone number includes country code. Ensure your message template is pre-approved by WhatsApp. Try using the fallback SMS option.
+                            </div>
+                        </div>
+                        <div class="error-item">
+                            <div class="error-title">
+                                <i class="fas fa-times-circle"></i>
+                                <span>Calendar Sync Error</span>
+                            </div>
+                            <div class="error-solution">
+                                <strong>Solution:</strong> Reconnect Google Calendar in Settings > Integrations. Enable 2-way sync in your Google Calendar settings. Add buffer time between appointments.
+                            </div>
+                        </div>
+                        <div class="error-item">
+                            <div class="error-title">
+                                <i class="fas fa-times-circle"></i>
+                                <span>Duplicate Lead Entries</span>
+                            </div>
+                            <div class="error-solution">
+                                <strong>Solution:</strong> Enable deduplication rules in Settings. Search for existing contacts before adding new leads. Use unique identifiers like phone number or email.
+                            </div>
+                        </div>
+                        <div class="error-item">
+                            <div class="error-title">
+                                <i class="fas fa-times-circle"></i>
+                                <span>Lead Not Receiving Messages</span>
+                            </div>
+                            <div class="error-solution">
+                                <strong>Solution:</strong> Add 3-step follow-up sequence. Offer call-back option. Check if the phone number is valid. Verify message template approval status.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="help-contact">
+                        <h3><i class="fas fa-headset"></i> Still Need Help?</h3>
+                        <p>Contact our support team for personalized assistance</p>
+                        <div class="contact-buttons">
+                            <button class="btn btn-primary"><i class="fas fa-envelope"></i> Email Support</button>
+                            <button class="btn btn-secondary"><i class="fas fa-comment"></i> Live Chat</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="login-overlay" id="login-overlay">
+        <div class="login-container">
+            <div class="login-header">
+                <div class="login-logo">
+                    <i class="fas fa-heartbeat"></i>
+                    <span>ClinicFlow</span>
+                </div>
+                <h2>Welcome Back</h2>
+                <p>Sign in to manage your clinic</p>
+            </div>
+            <form class="login-form" id="login-form">
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="login-email" placeholder="admin@smiledental.com" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" id="login-password" placeholder="Enter your password" required>
+                    <span class="password-toggle" onclick="togglePassword()">
+                        <i class="fas fa-eye" id="eye-icon"></i>
+                    </span>
+                </div>
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox" checked>
+                        <span>Remember me</span>
+                    </label>
+                    <a href="#" class="forgot-password">Forgot password?</a>
+                </div>
+                <button type="submit" class="btn btn-primary btn-login">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </button>
+            </form>
+            <div class="login-footer">
+                <p><strong>Demo:</strong> admin@smiledental.com / admin123</p>
+                <p><strong>Pro:</strong> drjohnson@brightsmile.com / demo123</p>
+                <p><strong>Basic:</strong> dentalcare@familyfirst.com / demo123</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Lead Modal -->
+    <div class="modal" id="add-lead-modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Lead</h2>
+                <button class="modal-close" id="close-lead-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="lead-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>First Name *</label>
+                            <input type="text" name="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name *</label>
+                            <input type="text" name="lastName" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Phone *</label>
+                            <input type="tel" name="phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" name="email">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Lead Source *</label>
+                        <select name="source" required>
+                            <option value="">Select Source</option>
+                            <option value="website">Website</option>
+                            <option value="whatsapp">WhatsApp</option>
+                            <option value="facebook">Facebook</option>
+                            <option value="phone">Phone Call</option>
+                            <option value="referral">Referral</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Treatment Interest *</label>
+                        <select name="treatment" required>
+                            <option value="">Select Treatment</option>
+                            <option value="checkup">General Checkup</option>
+                            <option value="cleaning">Teeth Cleaning</option>
+                            <option value="whitening">Teeth Whitening</option>
+                            <option value="braces">Braces/Invisalign</option>
+                            <option value="implants">Dental Implants</option>
+                            <option value="rootcanal">Root Canal</option>
+                            <option value="extraction">Tooth Extraction</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Budget Range</label>
+                            <select name="budget">
+                                <option value="">Select Budget</option>
+                                <option value="0-500">$0 - $500</option>
+                                <option value="500-1000">$500 - $1,000</option>
+                                <option value="1000-2000">$1,000 - $2,000</option>
+                                <option value="2000-5000">$2,000 - $5,000</option>
+                                <option value="5000+">$5,000+</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Urgency</label>
+                            <select name="urgency">
+                                <option value="">Select Urgency</option>
+                                <option value="immediate">Immediate</option>
+                                <option value="this-month">This Month</option>
+                                <option value="this-quarter">This Quarter</option>
+                                <option value="flexible">Flexible</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea name="notes" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancel-lead">Cancel</button>
+                <button class="btn btn-primary" id="save-lead">Save Lead</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div class="modal" id="booking-modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Book Appointment</h2>
+                <button class="modal-close" id="close-booking-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="booking-patient-info">
+                    <h3>Patient: <span id="booking-patient-name">-</span></h3>
+                    <p>Treatment: <span id="booking-treatment">-</span></p>
+                </div>
+                <div class="calendar-picker">
+                    <div class="calendar-header">
+                        <button class="btn btn-icon" id="prev-month"><i class="fas fa-chevron-left"></i></button>
+                        <h3 id="calendar-month-year">January 2025</h3>
+                        <button class="btn btn-icon" id="next-month"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="calendar-days">
+                        <span>Sun</span>
+                        <span>Mon</span>
+                        <span>Tue</span>
+                        <span>Wed</span>
+                        <span>Thu</span>
+                        <span>Fri</span>
+                        <span>Sat</span>
+                    </div>
+                    <div class="calendar-dates" id="calendar-dates">
+                        <!-- Dates will be generated by JS -->
+                    </div>
+                </div>
+                <div class="time-slots" id="time-slots">
+                    <h4>Available Times</h4>
+                    <div class="slots-grid">
+                        <button class="time-slot" data-time="09:00">9:00 AM</button>
+                        <button class="time-slot" data-time="09:30">9:30 AM</button>
+                        <button class="time-slot" data-time="10:00">10:00 AM</button>
+                        <button class="time-slot" data-time="10:30">10:30 AM</button>
+                        <button class="time-slot" data-time="11:00">11:00 AM</button>
+                        <button class="time-slot" data-time="11:30">11:30 AM</button>
+                        <button class="time-slot" data-time="14:00">2:00 PM</button>
+                        <button class="time-slot" data-time="14:30">2:30 PM</button>
+                        <button class="time-slot" data-time="15:00">3:00 PM</button>
+                        <button class="time-slot" data-time="15:30">3:30 PM</button>
+                        <button class="time-slot" data-time="16:00">4:00 PM</button>
+                        <button class="time-slot" data-time="16:30">4:30 PM</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancel-booking">Cancel</button>
+                <button class="btn btn-primary" id="confirm-booking">Confirm Booking</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Subscription Modal -->
+    <div class="modal" id="subscription-modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content modal-wide">
+            <div class="modal-header">
+                <h2><i class="fas fa-crown"></i> Choose Your Plan</h2>
+                <button class="modal-close" onclick="document.getElementById('subscription-modal').classList.remove('active')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="subscription-plans-grid" id="subscription-plans"></div>
+                <div class="payment-section" id="payment-section" style="display:none; margin-top:30px; border-top:1px solid #eee; padding-top:20px;">
+                    <h3><i class="fas fa-credit-card"></i> Payment Details</h3>
+                    <p>Selected Plan: <strong id="selected-plan-name">-</strong> - <strong id="selected-plan-price">-</strong></p>
+                    <div class="payment-methods">
+                        <h4>Select Payment Method:</h4>
+                        <div class="payment-methods-grid">
+                            <div class="payment-method-option" data-method="airtel_money"><i class="fas fa-mobile-alt"></i><span>Airtel Money</span></div>
+                            <div class="payment-method-option" data-method="mtn_money"><i class="fas fa-phone"></i><span>MTN Mobile Money</span></div>
+                            <div class="payment-method-option" data-method="airtel_card"><i class="fas fa-credit-card"></i><span>Airtel Mastercard</span></div>
+                        </div>
+                    </div>
+                    <div class="payment-form" id="airtel_money-form" style="display:none; margin-top:20px;">
+                        <div class="form-group"><label>Airtel Phone Number *</label><input type="tel" id="airtel-phone" placeholder="2567XX XXX XXX" value="256701234567"></div>
+                        <div class="form-group"><label>National ID Number *</label><input type="text" id="airtel-national-id" placeholder="CMXXXXXXXXXXXXX" value="CM890123456789"></div>
+                        <p class="payment-instructions"><i class="fas fa-info-circle"></i> You will receive an STK push. Enter PIN to confirm.</p>
+                    </div>
+                    <div class="payment-form" id="mtn_money-form" style="display:none; margin-top:20px;">
+                        <div class="form-group"><label>MTN Phone Number *</label><input type="tel" id="mtn-phone" placeholder="2567X XXX XXXX" value="256703456789"></div>
+                        <div class="form-group"><label>National ID Number *</label><input type="text" id="mtn-national-id" placeholder="CMXXXXXXXXXXXXX" value="CM890345678901"></div>
+                        <p class="payment-instructions"><i class="fas fa-info-circle"></i> You will receive an M-PIN prompt. Enter PIN to confirm.</p>
+                    </div>
+                    <div class="payment-form" id="airtel_card-form" style="display:none; margin-top:20px;">
+                        <div class="form-group"><label>Registered Phone *</label><input type="tel" id="card-phone" placeholder="2567XX XXX XXX" value="256704567890"></div>
+                        <div class="form-group"><label>National ID Number *</label><input type="text" id="card-national-id" placeholder="CMXXXXXXXXXXXXX" value="CM890456789012"></div>
+                        <p class="payment-instructions"><i class="fas fa-info-circle"></i> Redirecting to secure payment gateway.</p>
+                    </div>
+                    <div style="margin-top:20px;"><button class="btn btn-primary btn-block" id="initiate-payment-btn" onclick="initiatePayment()"><i class="fas fa-lock"></i> Pay Now</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Verification Modal -->
+    <div class="modal" id="payment-verify-modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h2><i class="fas fa-check-circle"></i> Verify Payment</h2>
+                <button class="modal-close" onclick="document.getElementById('payment-verify-modal').classList.remove('active')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="verify-payment-info"><p>Amount: <strong id="verify-amount">UGX 0</strong></p><p>Phone: <strong id="verify-phone">-</strong></p></div>
+                <div class="form-group"><label>Enter M-PIN sent to your phone:</label><input type="password" id="payment-code" placeholder="****" maxlength="4"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="document.getElementById('payment-verify-modal').classList.remove('active')">Cancel</button>
+                <button class="btn btn-primary" id="verify-payment-btn" onclick="verifyPayment()">Verify</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subscription Banner -->
+    <div class="subscription-banner" id="subscription-banner" style="display:none; position:fixed; bottom:0; left:0; right:0; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:white; padding:15px 20px; z-index:1000;">
+        <div style="display:flex; justify-content:space-between; align-items:center; max-width:1200px; margin:0 auto;">
+            <div><strong>Current Plan:</strong> <span id="current-plan-display">Basic</span> | <span id="plan-expiry">Expires: Feb 1, 2025</span></div>
+            <div><button class="btn btn-sm" style="background:rgba(255,255,255,0.2); color:white; border:1px solid white;" onclick="openSubscriptionModal()"><i class="fas fa-crown"></i> Upgrade Plan</button></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,23 @@
+# Netlify Configuration
+# Deploy to Netlify: https://app.netlify.com/
+
+[build]
+  command = "echo 'No build required - static files'"
+  publish = "/"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Environment variables (configure in Netlify dashboard)
+[context.production.environment]
+  NODE_VERSION = "18"
+
+# Custom headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
